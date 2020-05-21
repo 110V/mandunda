@@ -16,6 +16,7 @@ import "./customBlocks/generators/getVelocity"
 import "./customBlocks/generators/mouseEvent"
 import "./customBlocks/generators/setPos"
 import "./customBlocks/generators/setVelocity"
+import "./customBlocks/generators/setRotation"
 
 export const INITIAL_XML = '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>';
 
@@ -545,6 +546,22 @@ export const INITIAL_TOOLBOX_XML =
     </block>
   </value>
 </block>
+<block type="setrotation">
+      <value name="object">
+        <block type="getobject">
+          <value name="objectName">
+            <block type="text">
+              <field name="TEXT"></field>
+            </block>
+          </value>
+        </block>
+      </value>
+      <value name="NAME">
+        <block type="math_number">
+          <field name="NUM">0</field>
+        </block>
+      </value>
+    </block>
 </category>
 </xml>`;
 

@@ -34,4 +34,9 @@ export default class Transform {
             y: y * Math.cos(seta) + x * Math.sin(seta)
         };
     }
+
+    public clone()
+    {
+        return new Transform(this.x,this.y,this.scaleX,this.scaleY,this.roatation);
+    }
 }

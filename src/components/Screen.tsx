@@ -31,8 +31,6 @@ const Screen: React.FC<Props> = (props) => {
     const app = new PIXI.Application({ width: props.width, height: props.height });
 
     const container = new PIXI.Container();
-    container.pivot.set(0.5, 0.5);
-    container.position.set(props.width / 2, props.height / 2);
     container.interactiveChildren = true;
     container.interactive = true;
     app.stage.addChild(container);
@@ -67,21 +65,23 @@ const Screen: React.FC<Props> = (props) => {
         const transform_ = gameObjects[index].getTransform();
         transform_.x = transform.position.x;
         transform_.y = transform.position.y;
+        gameObjects[index].setTransform(transform_);
     });
 
     useEffect(() => {
         //초기화
         stageDiv?.appendChild(app.view);
-        app.ticker.add((delta) => {
-
-        });
         return () => {
             //마지막
         };
     }, []);
 
     return (
-        <div ref={ref => { stageDiv = ref }} />
+        <div>
+            <div ref={ref => { stageDiv = ref }} />
+            <button>그래픽 추가</button>
+            <button>무비클립화 하기</button>
+        </div>
     );
 }
 

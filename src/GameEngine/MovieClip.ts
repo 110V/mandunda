@@ -30,7 +30,7 @@ export default class MovieClip {
 
   public getTransform()
   {
-    return this.transform;
+    return this.transform.clone();
   }
 
 

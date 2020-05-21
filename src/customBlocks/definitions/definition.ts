@@ -124,7 +124,12 @@ Blockly.Blocks['addphysics'] = {
     this.appendValueInput("mass")
         .setCheck("Number")
         .appendField("질량");
+    this.appendDummyInput()
+        .appendField("고정된 물체인가? ")
+        .appendField(new Blockly.FieldCheckbox("FALSE"), "isstatic");
     this.setInputsInline(false);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
     this.setColour(0);
  this.setTooltip("물리세계에 던진다!");
  this.setHelpUrl("");
@@ -227,6 +232,25 @@ Blockly.Blocks['gamestart'] = {
         .setCheck(null)
         .appendField("시작");
     this.setColour(50);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['setrotation'] = {
+  init: function() {
+    this.appendValueInput("object")
+        .setCheck("object")
+        .appendField("오브젝트");
+    this.appendValueInput("NAME")
+        .setCheck("Number")
+        .appendField("의 각도를");
+    this.appendDummyInput()
+        .appendField("로 설정");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
  this.setTooltip("");
  this.setHelpUrl("");
   }

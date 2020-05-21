@@ -11,7 +11,7 @@ export default class Graphic {
     public height?:number;
 
     private parent?:MovieClip;
-    public data:string;
+    public data:PIXI.Texture;
     
     public body:Matter.Body|null = null; 
 
@@ -33,10 +33,10 @@ export default class Graphic {
 
     public getTransform()
     {
-        return this.transform;
+        return this.transform.clone();
     }
 
-    constructor(transform:Transform,data:string,width?:number,height?:number){
+    constructor(transform:Transform,data:PIXI.Texture,width?:number,height?:number){
         this.data = data;
         this.transform = transform;
         this.sprite = PIXI.Sprite.from(data);

@@ -9,21 +9,41 @@ import Transform from './GameEngine/Transform';
 import Graphic from './GameEngine/Graphic';
 import Matter from 'matter-js';
 import BlockFunctions from './GameEngine/blockFuncs/BlockFunctions';
+import ResourceManager from './GameEngine/ResourceManager';
 
 
-var cat = new Graphic(new Transform(0,0),"https://cdn.discordapp.com/avatars/396332940927434752/2a3698758cf3160e4da1761577509197.webp?size=64");
-var cat2 = new Graphic(new Transform(0,0),"https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/IaUrttj.png"); 
-var flash = new Graphic(new Transform(0,0),"https://cdn.discordapp.com/avatars/234243167979831297/3e17238f3fa55c867a049a8e392c6c8c.webp?size=128");
-
-
-
-
+let cat:any;
+let cat2:any;
 const game = new Game(500,500,document.body);
+const rm = new ResourceManager(onLoadResources);
+rm.add("t1","https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/IaUrttj.png")
+.add("t2","https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/IaUrttj.png")
+.add("t3","https://s3-us-west-2.amazonaws.com/s.cdpn.io/693612/IaUrttj.png").load();
 
-game.mainClip.addObject(cat2,[1],[new Transform(200,200)]);
 
-game.start();
-game.addPhysics(cat2,false,0.1,0.001);
+function onLoadResources(){
+  console.log("로드완료");
+
+  cat = new Graphic(new Transform(0,0),rm.getTexture("t1"));
+  cat2 = new Graphic(new Transform(0,0),rm.getTexture("t2")); 
+
+
+  game.mainClip.addObject(cat2,[1],[new Transform(200,200)]);
+  game.mainClip.addObject(cat,[1],[new Transform(100,100)]);
+  game.start();
+  game.addPhysics(cat2,false,0.001,10);
+  game.addPhysics(cat,false,0.001,10);
+
+  
+}
+
+
+
+
+
+
+
+
 const blockFunctions = BlockFunctions;
 
 
@@ -31,7 +51,7 @@ ReactDOM.render(
   <div>
 
   <button onClick = {()=>{
-    eval(`blockFunctions["addForce"](game,cat2,10,10)`)}}>test</button>
+    blockFunctions["addForce"](game,cat,1,1)}}>test</button>
   <App /></div>,
   document.getElementById('root')
 );
