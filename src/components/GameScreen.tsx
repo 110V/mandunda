@@ -13,6 +13,7 @@ interface Props{
 
 
 const GameScreen:React.FC<Props> = (props)=>{
+
     let game = useRef<Game>();
     let stageDiv = useRef<HTMLElement | null>(null);
     
@@ -30,7 +31,7 @@ const GameScreen:React.FC<Props> = (props)=>{
 
         const gameFile = JSON.parse(props.gameJson);
         const rm = new ResourceManager();
-
+        console.log(gameFile.code);
         rm.importJson(gameFile.resource,()=>{
             if(game.current==undefined){            
                 return;

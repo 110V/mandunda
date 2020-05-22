@@ -218,7 +218,7 @@ Blockly.Blocks['mouseevent'] = {
         .setCheck("object");
     this.appendStatementInput("blocks")
         .setCheck(null)
-        .appendField(new Blockly.FieldDropdown([["눌림","down"], ["뗌","up"], ["움직임","move"], ["나감","over"], ["클릭","click"]]), "type")
+        .appendField(new Blockly.FieldDropdown([["눌림","mousedown"], ["뗌","mouseup"], ["움직임","mousemove"], ["올림","mouseover"], ["클릭","mouseclick"]]), "type")
         .appendField("이벤트");
     this.setColour(230);
  this.setTooltip("");
