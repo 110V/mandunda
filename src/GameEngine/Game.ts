@@ -23,6 +23,8 @@ export default class Game {
     private bodys: { gameObject: (MovieClip | Graphic), body: Matter.Body }[] = [];
     public startCallback: (()=>void)[] = [];
 
+    private isDestroying = false;
+
 
     constructor(width: number, height: number, target: HTMLElement, backgroundColor = 0x000000, fps = 60) {
         this.app = new PIXI.Application({
@@ -65,6 +67,10 @@ export default class Game {
     }
 
     private animate(game: Game) {
+        if(this.isDestroying){
+            this.app.destroy(true);
+            return;
+        }
         this.deltaTime = (new Date()).getTime() - this.lastTime;
         this.updatePhysics(this.deltaTime);
         this.timeLeft -= this.deltaTime;
@@ -78,6 +84,11 @@ export default class Game {
         this.app.renderer.render(this.app.stage,undefined,false);
         this.lastTime = (new Date()).getTime()
         requestAnimationFrame(() => { this.animate(game) });
+    }
+
+    public destroy()
+    {
+        this.isDestroying = true;
     }
 
     public stop() {

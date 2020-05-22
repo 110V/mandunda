@@ -16,6 +16,7 @@ import TextField from "@material-ui/core/TextField"
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { generateUUID } from './Utils';
 import fileDownload from 'js-file-download';
+import GameScreen from './components/GameScreen';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -40,8 +41,10 @@ let currentClip:MovieClip = mainClip;
 
 let workspace:any;
 const App = () => {
+  const [gameFile,setGameFile] = useState<string>("");
   const [objectName,setObjectName] = useState("");
   const [isMovieclip,setIsMovieclip] = useState(false);
+  const [gameKey,setGameKey] = useState("0");
   const classes = useStyles();
 
   const graphicOpen = (e:any)=>{
@@ -153,7 +156,8 @@ const App = () => {
     const code = Blockly.JavaScript.workspaceToCode(workspace);
     const objectJson = mainClip.exportJson();
 
-    console.log(JSON.stringify({resource:resource,code:code,objects:objectJson}));
+    setGameFile(JSON.stringify({resource:resource,code:code,objects:objectJson}));
+    setGameKey(gameKey+1);
   }
 
   const saveProject = ()=>{
@@ -216,6 +220,7 @@ const App = () => {
         wrapperDivClassName={styles.fullHeight}
         workspaceDidChange={(w: any) => { workspace = w }} />
       </div>
+      <GameScreen width = {800} height = {500} gameJson = {gameFile} key={gameKey}/>
     </div>
   );
 }

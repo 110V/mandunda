@@ -8,13 +8,11 @@ import MovieClip from './GameEngine/MovieClip';
 import Transform from './GameEngine/Transform';
 import Graphic from './GameEngine/Graphic';
 import Matter from 'matter-js';
-import BlockFunctions from './GameEngine/blockFuncs/BlockFunctions';
+
 import ResourceManager from './GameEngine/ResourceManager';
 
 
 
-
-const blockFunctions = BlockFunctions;
 
 
 ReactDOM.render(
