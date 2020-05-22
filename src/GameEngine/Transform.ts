@@ -39,4 +39,8 @@ export default class Transform {
     {
         return new Transform(this.x,this.y,this.scaleX,this.scaleY,this.roatation);
     }
+
+    static fromObject(transform:any){
+        return new Transform(transform.x,transform.y,transform.scaleX,transform.scaleY,transform.roatation);
+    }
 }

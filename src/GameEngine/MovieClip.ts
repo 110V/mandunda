@@ -3,11 +3,14 @@ import * as PIXI from "pixi.js";
 import Frame from "./Frame";
 import Transform from "./Transform";
 import Graphic from "./Graphic";
+import Game from "./Game";
+import ResourceManager from "./ResourceManager";
 
 
 
 export default class MovieClip {
   //객체 정보
+  public name:string;
   private transform: Transform;
   private childs: (MovieClip|Graphic)[] = []
   private parent?: MovieClip;
@@ -18,7 +21,8 @@ export default class MovieClip {
 
   public body:Matter.Body|null = null; 
 
-  constructor(transform = Transform.init) {
+  constructor(name:string,transform = Transform.init) {
+    this.name = name;
     this.transform = transform;
     this.addFrame();
   }
@@ -85,6 +89,17 @@ export default class MovieClip {
     });
   }
 
+  public removeObject(object: MovieClip|Graphic,frameNum:number)
+  {
+    const frame = this.getFrame(frameNum);
+    frame.removeObject(object);
+    this.childs.map((el,i)=>{
+      if(el==object){
+          this.childs.splice(i,1);
+      }
+  })
+  }
+
   public getChild(num:number)
   {
     return this.childs[num];
@@ -140,5 +155,71 @@ export default class MovieClip {
     const bound = this.makeContainer(1).getBounds();
     container.destroy();
     return bound;
+  }
+
+  public exportStruct(transform:Transform)
+  {
+    let frames:any = [];
+    this.frames.map((frame)=>{
+      frames.push(frame.exportStruct());
+    }) 
+    let struct = {type:"MovieClip",name:this.name,
+                 transform:transform,
+                 frames:frames,
+                 maker:this.exportMaker()}
+    return struct;
+  }
+
+  public exportMaker()
+  {
+    //makers = [];
+    //makers.push({type:"MovieClip",name:this.name,transform:this.transform});
+    // this.childs.map((child)=>{
+    //   makers.push(child.exportMaker())
+    // })
+    return {type:"MovieClip",name:this.name,transform:this.transform};
+  }
+
+  public exportJson()
+  {
+    return JSON.stringify(this.exportStruct(new Transform(0,0)));
+  }
+
+  static importJson(json:string,rm:ResourceManager,game:Game|undefined = undefined)
+  {
+    const struct  = JSON.parse(json);
+    const clip = this.make(struct.maker,rm,game);
+    clip.importStruct(struct,rm,game);
+    return clip;
+  }
+
+  public importStruct(struct:any,rm:ResourceManager,game:Game|undefined = undefined)
+  {
+    struct.frames.map((batches:any,i:number)=>{
+      batches.map((batch:any)=>{
+        const object = MovieClip.make(batch.maker,rm,game);
+        this.addObject(object,[i+1],[Transform.fromObject(batch.transform)]);
+        if(object instanceof MovieClip)
+        {
+          object.importStruct(batch,rm,game);
+        }
+      });
+    });
+  }
+
+  static make(maker:any,resourceManager:ResourceManager,game:Game|undefined = undefined)
+  {
+    let object:any;
+    const transform = Transform.fromObject(maker.transform);
+    if(maker.type == "MovieClip"){
+      object = new MovieClip(maker.name,transform);
+    }
+    else { //Graphic
+      object = new Graphic(maker.name,transform,resourceManager,maker.texture,maker.width,maker.height);
+    }
+    if(game){
+      game.addObject(maker.name, object);
+    }
+    return object;
   }
 }

@@ -3,12 +3,16 @@ import * as PIXI from 'pixi.js';
 import MovieClip from '../GameEngine/MovieClip';
 import Graphic from '../GameEngine/Graphic';
 import TransformEditor from './ScreenUtils/TransformEditor';
+import Frame from '../GameEngine/Frame';
+
 
 interface Props {
     width: number,
     height: number,
     frame: number,
     movieClip: MovieClip,
+    selectedTargetChanged:(index:number|undefined)=>void,
+    resetFunc:Function,
 }
 
 /*
@@ -25,52 +29,79 @@ interface Props {
 
 
 
+let app:PIXI.Application;
+let container:PIXI.Container;
+let transformEditor:TransformEditor;
+let frame:Frame;
+let gameObjects:(MovieClip|Graphic)[];
+let pixiObjects:PIXI.DisplayObject[];
+
 
 const Screen: React.FC<Props> = (props) => {
-    let stageDiv: HTMLElement | null;
-    const app = new PIXI.Application({ width: props.width, height: props.height });
-
-    const container = new PIXI.Container();
-    container.interactiveChildren = true;
-    container.interactive = true;
-    app.stage.addChild(container);
-
-    const transformEditor = new TransformEditor(app, { color: 0x00CC99, radius: 1, thickness: 5 });
-    app.stage.interactive = true;
-    app.stage.interactiveChildren = true;
-    app.stage.hitArea = new PIXI.Rectangle(0, 0, app.renderer.width / app.renderer.resolution,
-         app.renderer.height / app.renderer.resolution);
-
-    const frame = props.movieClip.getFrame(props.frame);
-    let gameObjects:(MovieClip|Graphic)[] = frame.getObjects();
-    let pixiObjects:PIXI.DisplayObject[] = [];
+    console.log(props.movieClip.name);
     
-    frame.rebatchAll();
-    for(let i = 0; i < gameObjects.length;i++){
-        const gameObject = gameObjects[i];
-        let pixiObject:PIXI.DisplayObject;
+    let stageDiv: HTMLElement | null;
+    const init = ()=>{
+        app  = new PIXI.Application({ width: props.width, height: props.height });
+        stageDiv?.appendChild(app.view);
+        transformEditor  = new TransformEditor(app, { color: 0x00CC99, radius: 1, thickness: 5 });
+        app.stage.interactive = true;
+        app.stage.interactiveChildren = true;
+        app.stage.hitArea = new PIXI.Rectangle(0, 0, app.renderer.width / app.renderer.resolution,
+            app.renderer.height / app.renderer.resolution);
 
-        if(gameObject instanceof MovieClip){
-            pixiObject=gameObject.makeContainer(1)
-        }
-        else{
-            pixiObject=gameObject.sprite;
-        }
+        transformEditor.transformChanged = (index, transform) => {
+            const transform_ = gameObjects[index].getTransform();
+            transform_.x = transform.position.x;
+            transform_.y = transform.position.y;
+            gameObjects[index].setTransform(transform_);
+            frame.updateBatchToCurrentState();
+        };
 
-        container.addChild(pixiObject);
-        pixiObjects.push(pixiObject);
+        transformEditor.selectedTargetChanged = (index) =>{
+            props.selectedTargetChanged(index);
+        }
+        props.resetFunc(reset);
     }
-    transformEditor.setObjects(pixiObjects);
-    transformEditor.transformChanged.push((index,transform)=>{
-        const transform_ = gameObjects[index].getTransform();
-        transform_.x = transform.position.x;
-        transform_.y = transform.position.y;
-        gameObjects[index].setTransform(transform_);
-    });
 
+    const reset = (movieClip:MovieClip)=>{
+        if(container)
+            app.stage.removeChild(container);
+        
+        container = new PIXI.Container();
+        container.interactiveChildren = true;
+        container.interactive = true;
+        app.stage.addChild(container);
+        console.log(movieClip.name+"으로 들어옴{");
+        frame = movieClip.getFrame(props.frame);
+        frame.rebatchAll();
+        gameObjects = frame.getObjects();
+        
+        pixiObjects = [];
+        for(let i = 0; i < gameObjects.length;i++){
+            
+            const gameObject = gameObjects[i];
+            console.log(gameObject.name);
+            let pixiObject:PIXI.DisplayObject;
+    
+            if(gameObject instanceof MovieClip){
+                pixiObject=gameObject.makeContainer(1)
+            }
+            else{
+                pixiObject=gameObject.sprite;
+            }
+    
+            container.addChild(pixiObject);
+            pixiObjects.push(pixiObject);
+        }
+        transformEditor.setObjects(pixiObjects);
+        console.log("업데이트");
+    }
+
+    
     useEffect(() => {
         //초기화
-        stageDiv?.appendChild(app.view);
+        init();
         return () => {
             //마지막
         };
@@ -79,8 +110,6 @@ const Screen: React.FC<Props> = (props) => {
     return (
         <div>
             <div ref={ref => { stageDiv = ref }} />
-            <button>그래픽 추가</button>
-            <button>무비클립화 하기</button>
         </div>
     );
 }

@@ -27,6 +27,13 @@ export default class Frame {
         }
     }
 
+    public updateBatchToCurrentState()
+    {
+        this.batches.map((batch)=>{
+            batch.transform = batch.object.getTransform();
+        })
+    }
+
     public rebatchAll()
     {
         this.batches.forEach(batch => {
@@ -38,6 +45,16 @@ export default class Frame {
         this.objects.push(object);
         const batch:Batch = {object,transform} as Batch; 
         this.batches.push(batch);
+    }
+
+    public removeObject(object:MovieClip|Graphic)
+    {
+        this.objects.map((el,i)=>{
+            if(el==object){
+                this.objects.splice(i,1);
+                this.batches.splice(i,1);
+            }
+        })
     }
 
     public getObjects()
@@ -72,5 +89,21 @@ export default class Frame {
             
         });
         return container;
+    }
+
+
+    public exportStruct()
+    {
+        let newBatchs:any = [];
+        this.batches.map(batch=>{
+            if(batch.object instanceof MovieClip){
+                const tempBatch  = batch.object.exportStruct(batch.transform);
+                newBatchs.push(tempBatch);
+            }
+            else{
+                newBatchs.push({type:"Graphic",name:batch.object.name,transform:batch.transform,maker:batch.object.exportMaker()});
+            }
+        })
+        return newBatchs;
     }
 }

@@ -76,7 +76,7 @@ BlockFunctions["getMouseState"] = (game: Game, stateType: string) => {
 }
 
 BlockFunctions["getObject"] = (game: Game, objectName: string) => {
-    return game.getMovieClip(objectName);
+    return game.getObject(objectName);
 }
 
 BlockFunctions["getPos"] = (game: Game, type: string, object: (MovieClip | Graphic)) => {

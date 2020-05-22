@@ -8,7 +8,8 @@ export default class TransformEditor {
     private points: PIXI.Graphics[] = [];
     private style: { color: number, thickness: number, radius: number };
 
-    public transformChanged:((index:number,transform:PIXI.Transform)=>void)[] = [];
+    public transformChanged:((index:number,transform:PIXI.Transform)=>void) = ()=>{};
+    public selectedTargetChanged:((index:number|undefined)=>void) = ()=>{};
 
     constructor(app: PIXI.Application, style: { color: number, thickness: number, radius: number }) {
         this.app = app;
@@ -56,18 +57,24 @@ export default class TransformEditor {
         this.objects = objects;
         for(let i = 0;i < objects.length;i++)
         {
+            objects[i].removeAllListeners();
             objects[i].addListener("mousedown",()=>{this.targetMouseDown(i)});
             objects[i].interactive = true;
         }
         this.state = State.none;
+        if(objects.length!=0)
+            this.setTarget(this.targetIndex = objects.length-1)
+        else this.removeTarget();
     }
 
     public setTarget(targetIndex:number) {
         this.targetIndex = targetIndex;
+        this.selectedTargetChanged(this.targetIndex);
     }
 
     public removeTarget() {
         this.targetIndex = undefined;
+        this.selectedTargetChanged(undefined);
     }
 
     //events
@@ -76,6 +83,7 @@ export default class TransformEditor {
     }
 
     private targetMouseDown(index:number) {
+        console.log(index+"가눌림");
         this.setTarget(index);
         this.state = State.moving;
     }
@@ -87,9 +95,7 @@ export default class TransformEditor {
         if(this.state == State.moving)
         {
             const index = this.targetIndex;
-            this.transformChanged.map(func=>{
-                func(index,this.objects[index].transform);
-            })
+            this.transformChanged(index,this.objects[index].transform);
             this.state = State.none;
         }
     }

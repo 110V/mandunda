@@ -1,9 +1,11 @@
 import * as PIXI from "pixi.js";
 import Transform from "./Transform";
 import MovieClip from "./MovieClip";
+import ResourceManager from "./ResourceManager";
 
 export default class Graphic {
 
+    public name:string;
     public sprite:PIXI.Sprite;
 
     private transform:Transform;
@@ -11,7 +13,7 @@ export default class Graphic {
     public height?:number;
 
     private parent?:MovieClip;
-    public data:PIXI.Texture;
+    public texId:string;
     
     public body:Matter.Body|null = null; 
 
@@ -36,15 +38,21 @@ export default class Graphic {
         return this.transform.clone();
     }
 
-    constructor(transform:Transform,data:PIXI.Texture,width?:number,height?:number){
-        this.data = data;
+    constructor(name:string,transform:Transform,resourceManager:ResourceManager,texId:string,width?:number,height?:number){
+        console.log("make!",name,transform,width,height);
+        this.name = name;
+        this.texId = texId;
         this.transform = transform;
-        this.sprite = PIXI.Sprite.from(data);
+        this.sprite = PIXI.Sprite.from(resourceManager.getTexture(texId));
 
         if(width)
             this.width = width;
         if(height)
             this.height = height;
+        
+        this.width = this.sprite.width;
+        this.height = this.sprite.height;
+        console.log(this);
     }
 
     public update(app: PIXI.Application, transform: Transform = Transform.init) {
@@ -62,5 +70,10 @@ export default class Graphic {
     public render(app: PIXI.Application)
     {
         app.renderer.render(this.sprite,undefined,false);
+    }
+
+    public exportMaker()
+    {
+      return {type:"Graphic",name:this.name,transform:this.transform,texture:this.texId,width:this.width,height:this.height};
     }
 }

@@ -6,7 +6,7 @@ import Transform from "./Transform";
 import Graphic from "./Graphic";
 
 export default class Game {
-    public mainClip: MovieClip = new MovieClip();
+    public mainClip: MovieClip = new MovieClip("root");
 
     public app: PIXI.Application;
     private isPlaying: boolean = false;
@@ -88,11 +88,11 @@ export default class Game {
         this.isPlaying = true;
     }
 
-    public addMovieClip(name: string, movieClip: MovieClip) {
-        this.objects[name] = movieClip;
+    public addObject(name: string, object: MovieClip|Graphic) {
+        this.objects[name] = object;
     }
 
-    public getMovieClip(name: string) {
+    public getObject(name: string) {
         return this.objects[name];
     }
 
