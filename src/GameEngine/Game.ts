@@ -34,7 +34,7 @@ export default class Game {
         });
         this.setFps(fps);
         target.appendChild(this.app.view);
-        this.engine.world.gravity.y = 0.001;
+        this.engine.world.gravity.y = 1;
     }
 
     public setFps(fps: number) {
@@ -120,6 +120,7 @@ export default class Game {
         body.angle = transform.roatation;
         body.friction = friction;
         body.mass = mass;
+        body.isStatic = isStatic;
         Matter.World.add(this.engine.world, body);
         object.body = body;
         this.bodys.push({ body: body, gameObject: object });

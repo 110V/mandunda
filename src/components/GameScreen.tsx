@@ -48,7 +48,7 @@ const GameScreen:React.FC<Props> = (props)=>{
         return () => {
             game.current?.destroy();
         }
-    });
+    },[]);
     return (
         <div ref={ref => { stageDiv.current = ref }} />
     );
