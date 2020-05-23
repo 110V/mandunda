@@ -80,7 +80,6 @@ BlockFunctions["getObject"] = (game: Game, objectName: string) => {
 }
 
 BlockFunctions["getPos"] = (game: Game, type: string, object: (MovieClip | Graphic)) => {
-    console.log(type);
     switch(type)
     {
         case "x":

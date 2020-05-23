@@ -10,14 +10,13 @@ import Graphic from './GameEngine/Graphic';
 import Matter from 'matter-js';
 
 import ResourceManager from './GameEngine/ResourceManager';
-
+import Root from './Root';
 
 
 
 
 ReactDOM.render(
-  <div>
-  <App /></div>,
+  <Root/>,
   document.getElementById('root')
 );
 

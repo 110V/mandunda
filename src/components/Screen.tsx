@@ -12,7 +12,9 @@ interface Props {
     frame: number,
     movieClip: MovieClip,
     selectedTargetChanged:(index:number|undefined)=>void,
+    selectedTargetMoving:(x:number,y:number)=>void,
     resetFunc:Function,
+    className:string,
 }
 
 /*
@@ -38,12 +40,12 @@ let pixiObjects:PIXI.DisplayObject[];
 
 
 const Screen: React.FC<Props> = (props) => {
-    console.log(props.movieClip.name);
     
-    let stageDiv: HTMLElement | null;
+    const stageDiv = useRef<HTMLElement | null>(null);
     const init = ()=>{
-        app  = new PIXI.Application({ width: props.width, height: props.height });
-        stageDiv?.appendChild(app.view);
+        app  = new PIXI.Application({ width: props.width, height: props.height,backgroundColor:0xFFFFFF });
+        if(stageDiv.current)
+            stageDiv.current.appendChild(app.view);
         transformEditor  = new TransformEditor(app, { color: 0x00CC99, radius: 1, thickness: 5 });
         app.stage.interactive = true;
         app.stage.interactiveChildren = true;
@@ -58,9 +60,10 @@ const Screen: React.FC<Props> = (props) => {
             frame.updateBatchToCurrentState();
         };
 
-        transformEditor.selectedTargetChanged = (index) =>{
-            props.selectedTargetChanged(index);
-        }
+        transformEditor.selectedTargetChanged = props.selectedTargetChanged;
+
+        transformEditor.selectedTargetMoving = props.selectedTargetMoving;
+
         props.resetFunc(reset);
     }
 
@@ -72,7 +75,6 @@ const Screen: React.FC<Props> = (props) => {
         container.interactiveChildren = true;
         container.interactive = true;
         app.stage.addChild(container);
-        console.log(movieClip.name+"으로 들어옴{");
         frame = movieClip.getFrame(props.frame);
         frame.rebatchAll();
         gameObjects = frame.getObjects();
@@ -81,7 +83,6 @@ const Screen: React.FC<Props> = (props) => {
         for(let i = 0; i < gameObjects.length;i++){
             
             const gameObject = gameObjects[i];
-            console.log(gameObject.name);
             let pixiObject:PIXI.DisplayObject;
     
             if(gameObject instanceof MovieClip){
@@ -95,7 +96,6 @@ const Screen: React.FC<Props> = (props) => {
             pixiObjects.push(pixiObject);
         }
         transformEditor.setObjects(pixiObjects);
-        console.log("업데이트");
     }
 
     
@@ -108,9 +108,7 @@ const Screen: React.FC<Props> = (props) => {
     }, []);
 
     return (
-        <div>
-            <div ref={ref => { stageDiv = ref }} />
-        </div>
+        <div className = {props.className} ref={ref => { stageDiv.current = ref }} />
     );
 }
 
@@ -193,7 +191,7 @@ const Screen: React.FC<Props> = (props) => {
 //             draggingObject.pixiObject.alpha = 1;
 //         }
 //         draggingObject = null;
-//         console.log("up");
+//         ("up");
 //     }
 
 //     let prevMouseX:number;

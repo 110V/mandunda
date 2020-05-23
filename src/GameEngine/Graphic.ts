@@ -39,7 +39,6 @@ export default class Graphic {
     }
 
     constructor(name:string,transform:Transform,resourceManager:ResourceManager,texId:string,width?:number,height?:number){
-        console.log("make!",name,transform,width,height);
         this.name = name;
         this.texId = texId;
         this.transform = transform;
@@ -52,7 +51,6 @@ export default class Graphic {
         
         this.width = this.sprite.width;
         this.height = this.sprite.height;
-        console.log(this);
     }
 
     public update(app: PIXI.Application, transform: Transform = Transform.init) {

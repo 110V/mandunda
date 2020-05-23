@@ -1,25 +1,35 @@
 import * as PIXI from 'pixi.js';
+import FrontUI from './FrontUI';
 
 export default class TransformEditor {
     private app: PIXI.Application;
     private container = new PIXI.Container();
 
+    private frontUI:FrontUI;
     private border = new PIXI.Graphics();
     private points: PIXI.Graphics[] = [];
     private style: { color: number, thickness: number, radius: number };
 
     public transformChanged:((index:number,transform:PIXI.Transform)=>void) = ()=>{};
     public selectedTargetChanged:((index:number|undefined)=>void) = ()=>{};
+    public selectedTargetMoving:(x:number,y:number)=>void = ()=>{};
 
     constructor(app: PIXI.Application, style: { color: number, thickness: number, radius: number }) {
         this.app = app;
         this.style = style;
 
-        app.ticker.add(this.tick);
+        app.ticker.add(()=>{this.tick()});
         this.init();
+        this.frontUI = new FrontUI(app);
     }
 
     private tick() {
+        if(this.targetIndex==undefined)
+            return;
+
+        const target = this.objects[this.targetIndex];
+        const bound = target.getBounds();
+        this.frontUI.drawRect(5,0x66CC00,1,bound.x-2.5,bound.y-2.5,bound.width+5,bound.height+5,0);
         // alert("hello");
         // if(!this.app)
         //     return;
@@ -59,6 +69,8 @@ export default class TransformEditor {
         {
             objects[i].removeAllListeners();
             objects[i].addListener("mousedown",()=>{this.targetMouseDown(i)});
+            objects[i].addListener("mouseover",()=>{this.mouseOver(objects[i])});
+            objects[i].addListener("mouseout",()=>{this.mouseOut(objects[i])});
             objects[i].interactive = true;
         }
         this.state = State.none;
@@ -77,13 +89,24 @@ export default class TransformEditor {
         this.selectedTargetChanged(undefined);
     }
 
+    public mouseOver(target:PIXI.DisplayObject)
+    {
+        if(this.state==State.moving)
+            return;
+        target.alpha = 0.7;
+    }
+
+    public mouseOut(target:PIXI.DisplayObject)
+    {
+        target.alpha = 1;
+    }
+
     //events
     private pointMouseDown(num: number) {
         
     }
 
     private targetMouseDown(index:number) {
-        console.log(index+"가눌림");
         this.setTarget(index);
         this.state = State.moving;
     }
@@ -116,6 +139,7 @@ export default class TransformEditor {
         if (this.state == State.moving) {
             target.transform.position.x += deltaMouseX;
             target.transform.position.y += deltaMouseY;
+            this.selectedTargetMoving(target.transform.position.x,target.transform.position.y);
         }
     }
     //calcs

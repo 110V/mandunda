@@ -26,7 +26,7 @@ export default class Game {
     private isDestroying = false;
 
 
-    constructor(width: number, height: number, target: HTMLElement, backgroundColor = 0x000000, fps = 60) {
+    constructor(width: number, height: number, target: HTMLElement, backgroundColor = 0xFFFFFF, fps = 60) {
         this.app = new PIXI.Application({
             width: width,
             height: height,
@@ -44,21 +44,6 @@ export default class Game {
 
     public start() {
         PIXI.Loader.shared.on("complete",()=>{alert("완료")});
-        let render = Matter.Render.create({
-            element: document.body,
-            engine: this.engine,
-            options: {
-                width: 500,
-                height: 500,
-                background: '#fafafa',
-                wireframeBackground: '#222',
-                hasBounds: false,
-            },
-        });
-        
-        Matter.Render.run(render);
-
-
         this.initEvents();
         this.isPlaying = true;
         this.mainClip.update(this.app, Transform.init, true);
@@ -188,12 +173,10 @@ export default class Game {
         window.addEventListener("keyup", (e) => { this.keyUp(e) });
 
         this.keys[4] = true;
-        console.log(this.keys[4]);
 
 
 
         this.app.ticker.add(() => { this.eventTick() })
-        this.app.ticker.add(() => { if (this.isMouseOnceClick()) console.log("a") })
     }
 
     private eventTick() {
@@ -227,13 +210,11 @@ export default class Game {
     }
 
     private onMouseDown(e: PIXI.interaction.InteractionEvent) {
-        console.log("호우");
         this.mouseDown = true;
         this.mouseOnceDown = 2;
     }
 
     private onMouseUp(e: PIXI.interaction.InteractionEvent) {
-        console.log("주의!");
         this.mouseDown = false;
         this.mouseOnceUp = 2;
     }

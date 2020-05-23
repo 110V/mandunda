@@ -17,7 +17,6 @@ export default class ResourceManager {
 
     public add(name: string, data: string) {
         this.queue.push({ name: name, data: data });
-        console.log(this.queue.length);
         return this;
     }
 
@@ -27,17 +26,15 @@ export default class ResourceManager {
 
         for (let i = 0; i < this.queue.length; i++) {
             const el = this.queue[i];
-            console.log(i);
+
             imageToBase64(el.data).then(
                 (response: string) => {
-                    console.log(el.name,response);
                     this.addDirectBase64(el.name,"data:image/png;base64,"+response);
                     this.onConvert();
                 }
             ).catch(
                 (error: string) => {
                     this.onConvert();
-                    console.log(error);
                 }
             )
         }

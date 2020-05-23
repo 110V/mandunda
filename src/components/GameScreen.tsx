@@ -9,6 +9,7 @@ interface Props{
     width:number,
     height:number,
     gameJson:string,
+    className?:string,
 }
 
 
@@ -25,21 +26,23 @@ const GameScreen:React.FC<Props> = (props)=>{
             return;
         }
         game.current = new Game(props.width,props.height,stageDiv.current);
-
-
-
-
-        const gameFile = JSON.parse(props.gameJson);
-        const rm = new ResourceManager();
-        console.log(gameFile.code);
-        rm.importJson(gameFile.resource,()=>{
-            if(game.current==undefined){            
-                return;
-            }
-            game.current.mainClip = MovieClip.importJson(gameFile.objects,rm,game.current);
-            eval(`(function(game,blockFunctions){${gameFile.code}})`)(game.current,BlockFunctions);
-            game.current.start();
-        });
+        
+        try{
+            const gameFile = JSON.parse(props.gameJson);
+            const rm = new ResourceManager();
+            rm.importJson(gameFile.resource, () => {
+                if (game.current == undefined) {
+                    return;
+                }
+                game.current.mainClip = MovieClip.importJson(gameFile.objects, rm, game.current);
+                eval(`(function(game,blockFunctions){${gameFile.code}})`)(game.current, BlockFunctions);
+                game.current.start();
+            });
+        }
+        catch(e){
+            alert("에러 발생")
+            console.log(e);
+        }
     }
 
     useEffect(() => {
@@ -50,7 +53,7 @@ const GameScreen:React.FC<Props> = (props)=>{
         }
     },[]);
     return (
-        <div ref={ref => { stageDiv.current = ref }} />
+        <div className = {props.className} style = {{border:"#F3F3F3 solid 3px"}} ref={ref => { stageDiv.current = ref }} />
     );
 }
 
