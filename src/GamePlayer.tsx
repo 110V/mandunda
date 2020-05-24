@@ -11,7 +11,7 @@ const GamePlayer: React.SFC<RouteComponentProps<MatchParams>> = ({ match }) => {
   const [gameFile,setGameFile] = React.useState("");
   const [gameLoad,setGameLoad] = React.useState(false);
   React.useEffect(()=>{
-    fetch("http://203.234.191.126:5353/"+match.params.id).then(x => x.text()).then(x => {
+    fetch("http://203.234.191.83:5353/"+match.params.id).then(x => x.text()).then(x => {
         setGameFile(x);
         setGameLoad(true)
       })

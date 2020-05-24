@@ -292,7 +292,7 @@ const App = () => {
   }
   //upload
   const uploadProject = ()=>{
-    fetch("http://203.234.191.126:5353/"+projectName.replace(" ","_"), {
+    fetch("http://203.234.191.83:5353/"+projectName.replace(" ","_"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
