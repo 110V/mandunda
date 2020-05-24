@@ -112,7 +112,7 @@ export default class Game {
         return this.objects[name];
     }
 
-    public addPhysics(object: Graphic | MovieClip, isStatic: boolean, friction: number, mass: number) {
+    public addPhysics(object: Graphic | MovieClip, isStatic: boolean, friction: number, mass: number, noRotation:boolean) {
         let bound: PIXI.Rectangle;
         if (object instanceof MovieClip) {
             bound = object.getBound();
@@ -121,12 +121,14 @@ export default class Game {
             bound = object.sprite.getBounds();
         }
         const transform = object.getTransform();
-        const body = Matter.Bodies.rectangle(transform.x, transform.y, bound.width, bound.height);
-        body.angle = transform.roatation;
+        const body = Matter.Bodies.rectangle(transform.x+bound.width/2, transform.y+bound.height/2, bound.width, bound.height);
+        body.angle = transform.rotation;
         body.friction = friction;
         body.mass = mass;
         body.isStatic = isStatic;
         Matter.World.add(this.engine.world, body);
+        if(noRotation)
+            Matter.Body.setInertia(body,9999999999);
         object.body = body;
         this.bodys.push({ body: body, gameObject: object });
 

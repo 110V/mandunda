@@ -6,7 +6,9 @@ Blockly.JavaScript['addphysics'] = function (block: any) {
   var value_friction = Blockly.JavaScript.valueToCode(block, 'friction', Blockly.JavaScript.ORDER_ATOMIC);
   var value_mass = Blockly.JavaScript.valueToCode(block, 'mass', Blockly.JavaScript.ORDER_ATOMIC);
   var checkbox_isstatic = block.getFieldValue('isstatic') == 'TRUE';
+  var checkbox_norotation = block.getFieldValue('norotation') == 'TRUE';
   // TODO: Assemble JavaScript into code variable.
-  var code = `blockFunctions["addPhysics"](game, ${value_object}, ${value_friction}, ${value_mass}, ${checkbox_isstatic});\n`;
+  var code = `blockFunctions["addPhysics"](game, ${value_object}, ${value_friction}, ${value_mass}, ${checkbox_isstatic}, ${checkbox_norotation});\n`;
   return code;
 };
+

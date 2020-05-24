@@ -13,8 +13,8 @@ BlockFunctions["addForce"] = (game: Game, object: (MovieClip | Graphic), x: numb
     }
 }
 
-BlockFunctions["addPhysics"] = (game: Game, object: (MovieClip | Graphic), friction: number, mass: number, isStatic: boolean) => {
-    game.addPhysics(object, isStatic, friction, mass);
+BlockFunctions["addPhysics"] = (game: Game, object: (MovieClip | Graphic), friction: number, mass: number, isStatic: boolean, noRotation:boolean ) => {
+    game.addPhysics(object, isStatic, friction, mass, noRotation);
 }
 
 BlockFunctions["checkCollision"] = (game: Game, a: (MovieClip | Graphic), b: (MovieClip | Graphic)) => {
@@ -129,10 +129,11 @@ BlockFunctions["setVelocity"] = (game: Game, object: (MovieClip | Graphic), x: n
 
 BlockFunctions["setRotation"] = (game: Game, object: (MovieClip | Graphic), angle:number) => {
     if(object.body){
-        Matter.Body.setAngle(object.body,angle);
+        console.log(angle);
+        Matter.Body.setAngle(object.body, angle*Math.PI/180);
     }
     const transform = object.getTransform();
-    transform.roatation = angle;
+    transform.rotation = angle;
     object.setTransform(transform);
 }
 

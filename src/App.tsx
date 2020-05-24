@@ -299,7 +299,8 @@ const App = () => {
       },
       body: exportGameFile()
     }).then((response)=>{
-      alert("업로드 완료!\n /player/"+projectName.replace(" ","_")+"에서 플레이 가능!");
+      alert("업로드 완료! 주소가 복사되었습니다!");
+      navigator.clipboard.writeText("http://mandunda.com/#/player/"+projectName.replace(" ","_"));
     });
   }
 

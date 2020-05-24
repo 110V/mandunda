@@ -30,7 +30,7 @@ export default class Graphic {
     public setTransform(transform:Transform)
     {
         this.transform = transform;
-        this.sprite.setTransform(transform.x,transform.y,transform.scaleX,transform.scaleY,transform.roatation);
+        this.sprite.setTransform(transform.x,transform.y,transform.scaleX,transform.scaleY,transform.rotation);
     }
 
     public getTransform()
@@ -56,7 +56,7 @@ export default class Graphic {
     public update(app: PIXI.Application, transform: Transform = Transform.init) {
         const newTransform = transform.calcChildTransform(this.transform);
         this.sprite.transform.position.set(newTransform.x,newTransform.y);
-        this.sprite.transform.rotation = newTransform.roatation;
+        this.sprite.transform.rotation = newTransform.rotation;
         this.sprite.scale.set(newTransform.scaleX,newTransform.scaleY);
         if(this.width)
             this.sprite.width = this.width;

@@ -127,6 +127,9 @@ Blockly.Blocks['addphysics'] = {
     this.appendDummyInput()
         .appendField("고정된 물체인가? ")
         .appendField(new Blockly.FieldCheckbox("FALSE"), "isstatic");
+    this.appendDummyInput()
+        .appendField("각도 고정")
+        .appendField(new Blockly.FieldCheckbox("FALSE"), "norotation");
     this.setInputsInline(false);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);

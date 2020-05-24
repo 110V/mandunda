@@ -144,7 +144,7 @@ export default class MovieClip {
   public makeContainer(frame:number)
   {
     const container = this.getFrame(frame).makeContainer();
-    container.setTransform(this.transform.x,this.transform.y,this.transform.scaleX,this.transform.scaleY,this.transform.roatation);
+    container.setTransform(this.transform.x,this.transform.y,this.transform.scaleX,this.transform.scaleY,this.transform.rotation);
     return container;
   }
 
