@@ -113,7 +113,9 @@ BlockFunctions["mouseEvent"] = (game: Game, object: (MovieClip | Graphic), type:
 
 BlockFunctions["setPos"] = (game: Game, object: (MovieClip | Graphic), x: number, y: number) => {
     if(object.body){
-        Matter.Body.setPosition(object.body,{x:x,y:y});
+        const deltaX = object.body.vertices[0].x - object.body.position.x;
+        const deltaY = object.body.vertices[0].y - object.body.position.y;
+        Matter.Body.setPosition(object.body,{x:x-deltaX,y:y-deltaY});
     }
     const transform = object.getTransform();
     transform.x = x;
