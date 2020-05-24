@@ -16,6 +16,7 @@ export default class Game {
     private lastTime = (new Date()).getTime();
     private timeLeft = this.secondPerFrame * 1000;
     public deltaTime = 0;
+    public ticks:(()=>void)[] = []; 
 
     private objects: { [id: string]: (MovieClip | Graphic); } = {};
 
@@ -24,7 +25,7 @@ export default class Game {
     public startCallback: (()=>void)[] = [];
 
     private isDestroying = false;
-
+    private target:HTMLElement;
 
     constructor(width: number, height: number, target: HTMLElement, backgroundColor = 0xFFFFFF, fps = 60) {
         this.app = new PIXI.Application({
@@ -32,6 +33,7 @@ export default class Game {
             height: height,
             backgroundColor: backgroundColor
         });
+        this.target = target;
         this.setFps(fps);
         target.appendChild(this.app.view);
         this.engine.world.gravity.y = 1;
@@ -48,7 +50,25 @@ export default class Game {
         this.isPlaying = true;
         this.mainClip.update(this.app, Transform.init, true);
         this.startCallback.map(func => { func() });
+        this.ticks.map((tick)=>{
+            this.app.ticker.add(tick);
+        });
         requestAnimationFrame(() => { this.animate(this) });
+
+        // var render = Matter.Render.create({
+        //     element: this.target,
+        //     engine: this.engine,
+        //     options: {
+        //         width: 800,
+        //         height: 500,
+        //         background: '#fafafa',
+        //         wireframeBackground: '#222',
+        //         hasBounds: false,
+
+        //     }
+        // });
+    
+        // Matter.Render.run(render);
     }
 
     private animate(game: Game) {
@@ -56,7 +76,7 @@ export default class Game {
             this.app.destroy(true);
             return;
         }
-        this.deltaTime = (new Date()).getTime() - this.lastTime;
+        this.deltaTime = Math.min((new Date()).getTime() - this.lastTime,this.secondPerFrame * 1000);
         this.updatePhysics(this.deltaTime);
         this.timeLeft -= this.deltaTime;
         if (this.timeLeft < 0 && this.isPlaying) {
@@ -66,7 +86,6 @@ export default class Game {
         else {
             this.mainClip.render(this.app);
         }
-        this.app.renderer.render(this.app.stage,undefined,false);
         this.lastTime = (new Date()).getTime()
         requestAnimationFrame(() => { this.animate(game) });
     }
@@ -86,6 +105,7 @@ export default class Game {
 
     public addObject(name: string, object: MovieClip|Graphic) {
         this.objects[name] = object;
+        object.name = "e";
     }
 
     public getObject(name: string) {
@@ -114,15 +134,23 @@ export default class Game {
 
     private updatePhysics(deltaTime: number) {
         this.bodys.map((el) => {
-            el.gameObject.setTransform(new Transform(el.body.position.x, el.body.position.y, 1, 1, el.body.angle));
+            el.gameObject.setTransform(new Transform(el.body.vertices[0].x, el.body.vertices[0].y, 1, 1, el.body.angle));
         });
         Matter.Engine.update(this.engine, deltaTime, 1);
     }
 
-    public addMouseEvent(object:PIXI.DisplayObject,type:string,callback:()=>void){   
-        object.addListener(type, callback);
+    public addMouseEvent(object:PIXI.Sprite,type:string,callback:()=>void){  
+        object.interactive = true; 
+        object.hitArea = new PIXI.Rectangle(0, 0, object.width / this.app.renderer.resolution,
+            object.height / this.app.renderer.resolution);
+        object.interactiveChildren = true;
+        object.addListener(type,callback);
     }
 
+    public addTick(tickEvent:()=>void)
+    {
+        this.ticks.push(tickEvent);
+    }
 
     //mouse,keyboard events
     private keys: boolean[] = [];
@@ -165,17 +193,13 @@ export default class Game {
 
 
     private initEvents() {
-
-        this.app.stage.addListener("mousedown", (e) => {this.onMouseDown(e) });
-        this.app.stage.addListener("mouseup", (e) => {this.onMouseUp(e) })
-        this.app.stage.addListener("click", (e) => {this.onClick(e) });;
+        this.app.view.addEventListener("mousedown", () => {this.onMouseDown()});
+        this.app.view.addEventListener("mouseup", () => {this.onMouseUp()})
+        this.app.view.addEventListener("click", () => {this.onClick()});;
         window.addEventListener("keydown", (e) => { this.keyDown(e) });
         window.addEventListener("keyup", (e) => { this.keyUp(e) });
 
         this.keys[4] = true;
-
-
-
         this.app.ticker.add(() => { this.eventTick() })
     }
 
@@ -209,17 +233,17 @@ export default class Game {
 
     }
 
-    private onMouseDown(e: PIXI.interaction.InteractionEvent) {
+    private onMouseDown() {
         this.mouseDown = true;
         this.mouseOnceDown = 2;
     }
 
-    private onMouseUp(e: PIXI.interaction.InteractionEvent) {
+    private onMouseUp() {
         this.mouseDown = false;
         this.mouseOnceUp = 2;
     }
 
-    private onClick(e: PIXI.interaction.InteractionEvent) {
+    private onClick() {
         this.mouseOnceClick = 2;
     }
 

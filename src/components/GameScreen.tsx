@@ -3,6 +3,7 @@ import Game from '../GameEngine/Game';
 import ResourceManager from '../GameEngine/ResourceManager';
 import BlockFunctions from '../GameEngine/blockFuncs/BlockFunctions';
 import MovieClip from '../GameEngine/MovieClip';
+import { Sprite } from 'pixi.js';
 
 
 interface Props{

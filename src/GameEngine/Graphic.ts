@@ -62,6 +62,7 @@ export default class Graphic {
             this.sprite.width = this.width;
         if(this.height)
             this.sprite.height = this.height;
+
         app.renderer.render(this.sprite,undefined,false);
     }
 

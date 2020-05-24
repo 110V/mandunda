@@ -535,7 +535,7 @@ export const INITIAL_TOOLBOX_XML =
   </value>
 </block>
 <block type="mouseevent">
-  <field name="type">down</field>
+  <field name="type">mousedown</field>
   <value name="object">
     <block type="getobject">
       <value name="objectName">

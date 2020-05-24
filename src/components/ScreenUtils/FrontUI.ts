@@ -18,7 +18,6 @@ export default class FrontUI {
     }
 
     public drawRect(lineWidth: number, lineColor: number, alpha: number, x: number, y: number, width: number, height: number, rotation: number, pivot: { x: number, y: number } = { x: 0, y: 0 }) {
-        console.log("draw!");
         this.drawShape(lineWidth, lineColor, alpha, (graphic: PIXI.Graphics) => {
             graphic.drawRect(x, y, width, height);
             graphic.rotation = rotation;

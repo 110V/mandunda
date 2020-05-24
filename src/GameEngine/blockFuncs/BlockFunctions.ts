@@ -28,7 +28,7 @@ BlockFunctions["gameStart"] = (game: Game, blocks: () => {}) => {
 }
 
 BlockFunctions["gameTick"] = (game: Game, blocks: () => {}) => {
-    game.app.ticker.add(blocks);
+    game.addTick(blocks);
 }
 
 BlockFunctions["getKeyboardEvent"] = (game: Game, eventType: string, keyCode: number) => {
