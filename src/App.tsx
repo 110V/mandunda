@@ -43,6 +43,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 
 
@@ -291,6 +292,7 @@ const App = () => {
     setOpenMcNameDialog(false);
   }
   //upload
+
   const uploadProject = ()=>{
     fetch("http://203.234.191.83:5353/"+projectName.replace(" ","_"), {
       method: "POST",
@@ -299,8 +301,10 @@ const App = () => {
       },
       body: exportGameFile()
     }).then((response)=>{
+
+      
       alert("업로드 완료! 주소가 복사되었습니다!");
-      navigator.clipboard.writeText("http://mandunda.com/#/player/"+projectName.replace(" ","_"));
+      
     });
   }
 
@@ -407,7 +411,9 @@ const renderBreadcrumbs = ()=>{
           <IconButton onClick = {handleRunClick} edge="start" className={classes.runButton} color="inherit">
             <PlayArrowIcon style={{fontSize: 35}} />
           </IconButton>
+          <CopyToClipboard  text={"http://mandunda.com/#/player/"+projectName.replace(" ","_")}>
           <Button onClick = {uploadProject} startIcon={<ShareIcon />} className = {classes.shareButton} color="inherit">Upload</Button>
+          </CopyToClipboard>
         </Toolbar>
       </AppBar>
 
@@ -574,7 +580,7 @@ const renderBreadcrumbs = ()=>{
       </ReactModal>
 
 
-      
+      <div id="copy" style={{display: "none"}}>{"http://mandunda.com/#/player/"+projectName.replace(" ","_")}</div>
     </div>
   );
 }

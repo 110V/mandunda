@@ -26,6 +26,7 @@
     "matter-js": "^0.14.2",
     "react": "^16.13.1",
     "react-blockly": "^5.0.0",
+    "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "^16.13.1",
     "react-modal-resizable-draggable": "^0.1.4",
     "react-router-dom": "^5.2.0",
