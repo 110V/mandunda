@@ -152,11 +152,12 @@ const App = () => {
       return;
     }
     const nselectedObject = currentClip.getFrame(1).getObjects()[index];
+    if (!nselectedObject)
+      return;
     const pos = nselectedObject.getTransform();
     setSelectedObject(nselectedObject);
     setXYPos(pos.x,pos.y);
-    if (!nselectedObject)
-      return;
+
 
     setObjectName(nselectedObject.name);
     setIsMovieclip(nselectedObject instanceof MovieClip);

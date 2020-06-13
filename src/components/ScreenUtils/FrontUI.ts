@@ -6,15 +6,14 @@ export default class FrontUI {
 
     constructor(app: PIXI.Application) {
         this.app = app;
-
-        app.ticker.add(()=>{this.tick()});
-        this.app.stage.addChild(this.container);
+        this.app.stage.addChildAt(this.container,0);
     }
 
-    private tick()
+    public update()
     {
-        if(!this.app)
-            return;
+        this.container.removeChildren();
+        this.container.zIndex = 100;
+        this.app.stage.sortChildren();
     }
 
     public drawRect(lineWidth: number, lineColor: number, alpha: number, x: number, y: number, width: number, height: number, rotation: number, pivot: { x: number, y: number } = { x: 0, y: 0 }) {
@@ -40,7 +39,7 @@ export default class FrontUI {
     }
 
     public drawShape(lineWidth: number, lineColor: number, alpha: number, drawing: (graphic:PIXI.Graphics) => void) {
-        this.container.removeChildren();
+
         const graphic = new PIXI.Graphics();
         graphic.lineStyle(lineWidth, lineColor, alpha);
         drawing(graphic);

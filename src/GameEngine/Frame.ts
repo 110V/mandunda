@@ -31,6 +31,7 @@ export default class Frame {
     {
         this.batches.map((batch)=>{
             batch.transform = batch.object.getTransform();
+            console.log("Asdad"+batch.transform.scaleX);
         })
     }
 

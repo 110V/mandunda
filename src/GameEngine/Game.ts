@@ -136,7 +136,8 @@ export default class Game {
 
     private updatePhysics(deltaTime: number) {
         this.bodys.map((el) => {
-            el.gameObject.setTransform(new Transform(el.body.vertices[0].x, el.body.vertices[0].y, 1, 1, el.body.angle));
+            const transform = el.gameObject.getTransform();
+            el.gameObject.setTransform(new Transform(el.body.vertices[0].x, el.body.vertices[0].y, transform.scaleX, transform.scaleY, el.body.angle));
         });
         Matter.Engine.update(this.engine, deltaTime, 1);
     }

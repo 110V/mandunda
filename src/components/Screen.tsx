@@ -46,7 +46,7 @@ const Screen: React.FC<Props> = (props) => {
         app  = new PIXI.Application({ width: props.width, height: props.height,backgroundColor:0xFFFFFF });
         if(stageDiv.current)
             stageDiv.current.appendChild(app.view);
-        transformEditor  = new TransformEditor(app, { color: 0x00CC99, radius: 1, thickness: 5 });
+        transformEditor  = new TransformEditor(app, { color: 0x00CC99, radius: 10, thickness: 3 });
         app.stage.interactive = true;
         app.stage.interactiveChildren = true;
         app.stage.hitArea = new PIXI.Rectangle(0, 0, app.renderer.width / app.renderer.resolution,
@@ -56,6 +56,8 @@ const Screen: React.FC<Props> = (props) => {
             const transform_ = gameObjects[index].getTransform();
             transform_.x = transform.position.x;
             transform_.y = transform.position.y;
+            transform_.scaleX = transform.scale.x;
+            transform_.scaleY = transform.scale.y;
             gameObjects[index].setTransform(transform_);
             frame.updateBatchToCurrentState();
         };

@@ -58,10 +58,7 @@ export default class Graphic {
         this.sprite.transform.position.set(newTransform.x,newTransform.y);
         this.sprite.transform.rotation = newTransform.rotation;
         this.sprite.scale.set(newTransform.scaleX,newTransform.scaleY);
-        if(this.width)
-            this.sprite.width = this.width;
-        if(this.height)
-            this.sprite.height = this.height;
+
 
         app.renderer.render(this.sprite,undefined,false);
     }
