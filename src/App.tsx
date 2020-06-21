@@ -44,6 +44,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+import FrameBar from './components/FrameBar';
 
 
 
@@ -565,6 +566,7 @@ const renderBreadcrumbs = ()=>{
             <Button className={classes.Button} onClick={removeSelectedObject} variant="contained" color="secondary" disableElevation>삭제</Button>
           </div>
         </div>
+        <FrameBar currentFrame={1} maxFrame={10} frameChanged={(a)=>{}} />
       </div>
 
 

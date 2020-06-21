@@ -175,44 +175,8 @@ class FlexibleModal extends Component {
 
 	pressKey(e) {
 		const { onRequestClose, disableResize, disableMove, disableVerticalMove, disableHorizontalMove } = this.props;
-		if (e.ctrlKey) {
-			switch (e.keyCode) {
-				case 37:
-					!disableResize && this.setState((prevState) => ({ width: prevState.width - 20 }));
-					break;
-				case 38:
-					!disableResize && this.setState((prevState) => ({ height: prevState.height - 20 }));
-					break;
-				case 39:
-					!disableResize && this.setState((prevState) => ({ width: prevState.width + 20 }));
-					break;
-				case 40:
-					!disableResize && this.setState((prevState) => ({ height: prevState.height + 20 }));
-					break;
-			}
-		} else {
-			switch (e.keyCode) {
-				case 27:
-					onRequestClose();
-					break;
-				case 37:
-					!disableMove &&
-						!disableHorizontalMove &&
-						this.setState((prevState) => ({ left: prevState.left - 20 }));
-					break;
-				case 38:
-					!disableMove && !disableVerticalMove && this.setState((prevState) => ({ top: prevState.top - 20 }));
-					break;
-				case 39:
-					!disableMove &&
-						!disableHorizontalMove &&
-						this.setState((prevState) => ({ left: prevState.left + 20 }));
-					break;
-				case 40:
-					!disableMove && !disableVerticalMove && this.setState((prevState) => ({ top: prevState.top + 20 }));
-					break;
-			}
-		}
+
+		
 	}
 
 	resize(width, height) {
