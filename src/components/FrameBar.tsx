@@ -5,6 +5,8 @@ interface Props{
     currentFrame:number,
     maxFrame:number,
     frameChanged:(frame:number)=>void,
+    frameAdd:(frame:number)=>void,
+    frameRemove:(frame:number)=>void,
 }
 interface FrameProps{
     selected:boolean,
@@ -17,15 +19,16 @@ const FrameBar:React.FC<Props> = (props)=>{
     {
         frames.push(<Frame selected = {props.currentFrame==i} click = {()=>{props.frameChanged(i)}}/>);
     }
+
+
     return (
         <div>
             <div className={styles.bar}>
                 {frames}
             </div>
-            <button>+</button>
-            <button>-</button>
+            <button onClick={()=>{props.frameAdd(props.currentFrame+1)}}>+</button>
+            <button onClick={()=>{props.frameRemove(props.currentFrame)}}>-</button>
         </div>
-
     );
 }
 

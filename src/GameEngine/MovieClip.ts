@@ -65,6 +65,16 @@ export default class MovieClip {
     return this.getFrameCount();
   }
 
+  public removeFrame(i : number){
+    if(this.getFrameCount() == 1){
+      return 1;
+    }
+    
+    this.frames.splice(i-1,1);
+    this.currentFrame = Math.max(i-1,1);
+    return this.currentFrame;
+  }
+
   public extendFramesTo(frame: number) {
     const targetCount = frame - this.getFrameCount();
     for (let i = 0; i < targetCount; i++) {
