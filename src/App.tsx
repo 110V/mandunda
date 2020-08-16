@@ -44,6 +44,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import FrameBar from './components/FrameBar';
 
 
 
@@ -443,8 +444,15 @@ const App = () => {
   }
 
 
-  const handleClick = () => {
-
+  const [currentFrame, setCurrentFrame] = useState<{ frame: number, max: number }>({ frame: 1, max: 1 });
+  const frameChanged = (i: number) => {
+    setCurrentFrame({ frame: i, max: currentClip.getFrameCount() });
+  }
+  const frameAdd = (i: number) => {
+    frameChanged(currentClip.addFrame());
+  }
+  const frameRemove = (i: number) => {
+    frameChanged(currentClip.removeFrame(i));
   }
 
   const [breadObjects, setBreadObjects] = useState<(MovieClip)[]>([mainClip]);
@@ -652,6 +660,7 @@ const App = () => {
             <Button className={classes.Button} onClick={removeSelectedObject} variant="contained" color="secondary" disableElevation>삭제</Button>
           </div>
         </div>
+        <FrameBar currentFrame={currentFrame?.frame} maxFrame={currentFrame?.max} frameChanged={frameChanged} frameAdd = {frameAdd} frameRemove = {frameRemove}/>
       </div>
 
 

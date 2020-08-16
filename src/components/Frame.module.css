@@ -1,0 +1,31 @@
+.sFrame{
+    background-color: tomato;
+    border: black solid 1px;
+    width: 10px;
+    height: 20px;
+}
+.sFrame:hover{
+    background-color: rgb(246, 135, 115);
+    border: black solid 1px;
+    width: 10px;
+    height: 20px;
+}
+.usFrame{
+    background-color: gray;
+    border: black solid 1px;
+    width: 10px;
+    height: 20px;
+}
+.usFrame:hover{
+    background-color: rgb(182, 182, 182);
+    border: black solid 1px;
+    width: 10px;
+    height: 20px;
+}
+.bar{
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: start;
+    
+    background-color: whitesmoke;
+}
