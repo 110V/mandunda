@@ -17,6 +17,7 @@ import "./customBlocks/generators/mouseEvent"
 import "./customBlocks/generators/setPos"
 import "./customBlocks/generators/setVelocity"
 import "./customBlocks/generators/setRotation"
+import "./customBlocks/generators/currentObject"
 
 export const INITIAL_XML = '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>';
 
@@ -562,6 +563,7 @@ export const INITIAL_TOOLBOX_XML =
         </block>
       </value>
     </block>
+    <block type="currentobject"/>
 </category>
 </xml>`;
 

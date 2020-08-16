@@ -258,3 +258,13 @@ Blockly.Blocks['setrotation'] = {
  this.setHelpUrl("");
   }
 };
+Blockly.Blocks['currentobject'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("이 오브젝트");
+    this.setOutput(true, "object");
+    this.setColour(230);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};

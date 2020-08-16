@@ -43,7 +43,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 
 
@@ -67,22 +67,22 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       marginRight: theme.spacing(3),
     },
-    shareButton:{
+    shareButton: {
       marginLeft: "auto",
     },
-    runButton:{
+    runButton: {
       position: "absolute",
       transform: "translate(calc(50vw - 100%), 0)",
       transformOrigin: "-50% 0"
     },
-    Button:{
+    Button: {
       width: "100%",
       height: "100%"
     },
-    link:{
-      color:"white",
-      fontSize:"15px",
-    },
+    link: {
+      color: "white",
+      fontSize: "15px",
+    }
   }),
 );
 
@@ -93,24 +93,27 @@ let updateScreen: Function = () => { };
 let currentClip: MovieClip = mainClip;
 
 let workspace: any;
+let codes: { name: string, xml: any }[] = [{ name: "", xml: "<xml xmlns=\"https://developers.google.com/blockly/xml\"></xml>" }];
 let workspaceInit = false;
 
-const App = () => {
 
-  const workspaceChange = (w:any)=>{
-    if(workspaceInit)
+const App = () => {
+  const workspaceChange = (w: any) => {
+    if (workspaceInit)
       return;
     console.log("적용!");
-    workspaceInit=true;
+    workspaceInit = true;
     workspace = w;
   }
   const [gameFile, setGameFile] = useState<string>("");
   const [objectName, setObjectName] = useState("");
   const [isMovieclip, setIsMovieclip] = useState(false);
   const [selectedObject, setSelectedObject] = useState<MovieClip | Graphic | undefined>();
+  let selectedObject2: MovieClip | Graphic | undefined = undefined;
+
   //xy view
-  const xel = useRef<HTMLDivElement|null>();
-  const yel = useRef<HTMLDivElement|null>();
+  const xel = useRef<HTMLDivElement | null>();
+  const yel = useRef<HTMLDivElement | null>();
 
   const classes = useStyles();
 
@@ -135,6 +138,7 @@ const App = () => {
     const graphic = new Graphic(name, new Transform(0, 0), resourceManager, texId);
     currentClip.addObject(graphic, [1], [new Transform(0, 0)]);
     updateScreen(currentClip);
+    codes.push({ name: name, xml: "<xml xmlns=\"https://developers.google.com/blockly/xml\"></xml>" });
   }
 
   const changeCurrentClip = (clip: MovieClip) => {
@@ -143,24 +147,83 @@ const App = () => {
     renderBreadcrumbs();
   }
 
+  const getCodeXmlByObjectName = (name: string) => {
+    let xml: string = `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`;
+    if (name == "") {
+      console.log(name);
+      return codes[0].xml;
+    }
+    for (let i = 1; i < codes.length; i++) {
+      const el = codes[i];
+      if (el.name == name) {
+        return el.xml
+      }
+    }
+    return xml;
+  }
+
+  const saveCodeXmlByObjectName = (name: string) => {
+    const xml = Blockly.Xml.workspaceToDom(workspace);
+    const xml_text = Blockly.Xml.domToText(xml);
+    if (name == "") {
+      codes[0].xml = xml_text;
+      return;
+    }
+    codes.forEach((el, i) => {
+      if (el.name == name) {
+        codes[i].xml = xml_text;
+      }
+    });
+  }
+
+  const setWorkspaceCode = (xml: string) => {
+    try {
+      workspace.clear();
+      var dom = Blockly.Xml.textToDom(xml);
+      Blockly.Xml.domToWorkspace(dom, workspace);
+    }
+    catch{
+      console.log("오류남" + xml);
+    }
+  }
+
   const selectedTargetChanged = (index: number | undefined) => {
+    console.log(selectedObject2?.name + "Asd");
+    if (selectedObject2 == undefined) {
+      saveCodeXmlByObjectName("");
+    }
+    else {
+      saveCodeXmlByObjectName(selectedObject2.name);
+    }
+
     selectedIndex = index;
     if (index == undefined) {
       setSelectedObject(undefined);
+      selectedObject2 = undefined;
+
       setObjectName("");
       setIsMovieclip(false);
+      console.log(getCodeXmlByObjectName("") + '코드')
+      setWorkspaceCode(getCodeXmlByObjectName(""));
       return;
     }
     const nselectedObject = currentClip.getFrame(1).getObjects()[index];
-    if (!nselectedObject)
+    if (!nselectedObject) {
       return;
+    }
+    console.log(getCodeXmlByObjectName(nselectedObject.name));
+    console.log(codes);
+    setWorkspaceCode(getCodeXmlByObjectName(nselectedObject.name));
     const pos = nselectedObject.getTransform();
     setSelectedObject(nselectedObject);
-    setXYPos(pos.x,pos.y);
+    selectedObject2 = nselectedObject;
+    console.log(selectedObject2 + "Asd2");
+    setXYPos(pos.x, pos.y);
 
 
     setObjectName(nselectedObject.name);
     setIsMovieclip(nselectedObject instanceof MovieClip);
+
   }
 
   const onNameInputChanged = (event: any) => {
@@ -169,8 +232,16 @@ const App = () => {
       return;
     }
     setObjectName(event.target.value);
-    if (selectedObject)
+    if (selectedObject) {
+      for (let i = 1; i < codes.length; i++) {
+        const el = codes[i];
+        if (el.name == selectedObject.name) {
+          codes[i].name = event.target.value;
+          break;
+        }
+      }
       selectedObject.name = event.target.value;
+    }
   }
 
   const removeSelectedObject = () => {
@@ -216,11 +287,10 @@ const App = () => {
 
   const saveProject = () => {
     const resource = resourceManager.exportJson();
-    const xml = Blockly.Xml.workspaceToDom(workspace);
-    const xml_text = Blockly.Xml.domToText(xml);
+    const xml = JSON.stringify(codes);
 
     const objectJson = mainClip.exportJson();
-    fileDownload(JSON.stringify({ resource: resource, xml: xml_text, objects: objectJson }), projectName+".mandunda");
+    fileDownload(JSON.stringify({ resource: resource, xml: xml, objects: objectJson }), projectName + ".mandunda");
   }
 
   const projectOpen = (e: any) => {
@@ -236,7 +306,9 @@ const App = () => {
         resourceManager.importJson(project.resource, () => {
           mainClip = MovieClip.importJson(project.objects, resourceManager);
           workspace.clear();
-          var xml = Blockly.Xml.textToDom(project.xml);
+          codes = JSON.parse(project.xml);
+          console.log(codes);
+          var xml = Blockly.Xml.textToDom(codes[0]);
           Blockly.Xml.domToWorkspace(xml, workspace);
           changeCurrentClip(mainClip);
         })
@@ -248,25 +320,24 @@ const App = () => {
 
 
   //projectname
-  const [newPName,setNewPName] = useState("");
+  const [newPName, setNewPName] = useState("");
   const [projectName, setProjectName] = useState("New Project");
   const [openProjectNameDialog, setOpenProjectNameDialog] = useState(false);
   const handleEditProjectNameClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenProjectNameDialog(true);
   };
-  const projectNameCloseDialog = (set:boolean)=>{
-    if(set&&newPName!="")
-    {
+  const projectNameCloseDialog = (set: boolean) => {
+    if (set && newPName != "") {
       setProjectName(newPName);
     }
-    else{
+    else {
       setNewPName(projectName);
     }
     setOpenProjectNameDialog(false);
   }
 
   //movieclipName
-  const [newMcName,setNewMcName] = useState("new_movieclip");
+  const [newMcName, setNewMcName] = useState("new_movieclip");
   const [openMcNameDialog, setOpenMcNameDialog] = useState(false);
   const makeMovieClip = () => {
     if (selectedObject == undefined)
@@ -274,13 +345,13 @@ const App = () => {
 
     setNewMcName("new_movieclip")
     setOpenMcNameDialog(true);
+    codes.push({ name: "new_movieclip", xml: "<xml xmlns=\"https://developers.google.com/blockly/xml\"></xml>" });
   }
 
-  const mcNameCloseDialog = (set:boolean)=>{
+  const mcNameCloseDialog = (set: boolean) => {
     if (selectedObject == undefined)
       return;
-    if(set&&newMcName!="")
-    {
+    if (set && newMcName != "") {
       currentClip.getFrame(1).removeObject(selectedObject);
       let newPos = selectedObject.getTransform();
       const movieClip = new MovieClip(newMcName, new Transform(newPos.x, newPos.y));
@@ -294,54 +365,71 @@ const App = () => {
   }
   //upload
 
-  const uploadProject = ()=>{
-    fetch("http://203.234.191.83:5353/"+projectName.replace(" ","_"), {
+  const uploadProject = () => {
+    fetch("http://203.234.191.83:5353/" + projectName.replace(" ", "_"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: exportGameFile()
-    }).then((response)=>{
+    }).then((response) => {
 
-      
+
       alert("업로드 완료! 주소가 복사되었습니다!");
-      
+
     });
   }
 
 
   //gamerun
-  const [gameRuning,setGameRunning] = useState(false);
+  const [gameRuning, setGameRunning] = useState(false);
   const handleRunClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     gameStart();
     setGameRunning(true);
   };
-  const closeGameDialog = ()=>{
+  const closeGameDialog = () => {
     setGameRunning(false);
   }
 
 
   const gameStart = () => {
-    const resource = resourceManager.exportJson();
-    const code = Blockly.JavaScript.workspaceToCode(workspace);
-    const objectJson = mainClip.exportJson();
-
     setGameFile(exportGameFile());
   }
 
-  const exportGameFile = ()=>{
+  const exportGameFile = () => {
     const resource = resourceManager.exportJson();
-    const code = Blockly.JavaScript.workspaceToCode(workspace);
+    let wholeCode = "";
+    
+    if (selectedObject == undefined) {
+      saveCodeXmlByObjectName("");
+    }
+    else {
+      saveCodeXmlByObjectName(selectedObject.name);
+    }
+    for (let i = 0; i < codes.length; i++) {
+      workspace.clear();
+      var xml = Blockly.Xml.textToDom(codes[i].xml);
+      Blockly.Xml.domToWorkspace(xml, workspace);
+      const tempCode =  Blockly.JavaScript.workspaceToCode(workspace).replaceAll("{CURRENTOBJECT}",`blockFunctions["getObject"](game, "${codes[i].name}")`);
+      console.log(tempCode);
+      wholeCode += tempCode;
+    }
+    if (selectedObject == undefined) {
+      setWorkspaceCode(getCodeXmlByObjectName(""));
+    }
+    else {
+      setWorkspaceCode(getCodeXmlByObjectName(selectedObject.name));
+    }
     const objectJson = mainClip.exportJson();
 
-    return JSON.stringify({ resource: resource, code: code, objects: objectJson });
+    return JSON.stringify({ resource: resource, code: wholeCode, objects: objectJson });
   }
 
 
-  const resizeBlocky = ()=>{
-    if(workspace!=null)
+  const resizeBlocky = () => {
+    if (workspace != null)
       Blockly.svgResize(workspace);
-    }
+  }
 
   const setXYPos = (x: number, y: number) => {
     if (!xel.current || !yel.current)
@@ -355,30 +443,29 @@ const App = () => {
   }
 
 
-const handleClick = ()=>{
-  
-}
+  const handleClick = () => {
 
-const [breadObjects,setBreadObjects] = useState<(MovieClip)[]>([mainClip]);
-
-const renderBreadcrumbs = ()=>{
-  let current = currentClip; 
-  let objects:(MovieClip)[] = [];
-
-  for(let i = 0;i<3;i++){
-    objects.push(current);
-    if(current == mainClip)
-    {
-      break;
-    }
-    const parent = current.getParent();
-    if(parent)
-      current = parent;
   }
-  setBreadObjects(objects.reverse());
-}
 
-  window.addEventListener("mousemove",resizeBlocky);
+  const [breadObjects, setBreadObjects] = useState<(MovieClip)[]>([mainClip]);
+
+  const renderBreadcrumbs = () => {
+    let current = currentClip;
+    let objects: (MovieClip)[] = [];
+
+    for (let i = 0; i < 3; i++) {
+      objects.push(current);
+      if (current == mainClip) {
+        break;
+      }
+      const parent = current.getParent();
+      if (parent)
+        current = parent;
+    }
+    setBreadObjects(objects.reverse());
+  }
+
+  window.addEventListener("mousemove", resizeBlocky);
 
   return (
     <div className={styles.App}>
@@ -390,40 +477,40 @@ const renderBreadcrumbs = ()=>{
         anchorEl={menuAnchorEl}
         keepMounted
         open={Boolean(menuAnchorEl)}
-        onClose = {handleMenuClose}
+        onClose={handleMenuClose}
       >
         <MenuItem onClick={saveProject}> Save Project　<SaveIcon /></MenuItem>
         <label htmlFor="contained-button-file2">
           <MenuItem onClick={handleMenuClose}>Load Project　<FolderOpenIcon /></MenuItem>
-        </label> 
+        </label>
       </Menu>
 
       <AppBar position="static" className={styles.AppBar}>
         <Toolbar>
-          <IconButton onClick = {handleMenuClick} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+          <IconButton onClick={handleMenuClick} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
             만든다 - {projectName}
           </Typography>
-          <IconButton onClick = {handleEditProjectNameClick} edge="start" className={classes.editProjectNameButton} color="inherit">
+          <IconButton onClick={handleEditProjectNameClick} edge="start" className={classes.editProjectNameButton} color="inherit">
             <EditIcon />
           </IconButton>
-          <IconButton onClick = {handleRunClick} edge="start" className={classes.runButton} color="inherit">
-            <PlayArrowIcon style={{fontSize: 35}} />
+          <IconButton onClick={handleRunClick} edge="start" className={classes.runButton} color="inherit">
+            <PlayArrowIcon style={{ fontSize: 35 }} />
           </IconButton>
-          <CopyToClipboard  text={"http://mandunda.com/#/player/"+projectName.replace(" ","_")}>
-          <Button onClick = {uploadProject} startIcon={<ShareIcon />} className = {classes.shareButton} color="inherit">Upload</Button>
+          <CopyToClipboard text={"http://mandunda.com/#/player/" + projectName.replace(" ", "_")}>
+            <Button onClick={uploadProject} startIcon={<ShareIcon />} className={classes.shareButton} color="inherit">Upload</Button>
           </CopyToClipboard>
         </Toolbar>
       </AppBar>
 
 
 
-      <Dialog maxWidth={false} disableEscapeKeyDown={true} disableBackdropClick = {true} open={gameRuning} onClose={closeGameDialog} aria-labelledby="form-dialog-title">
+      <Dialog maxWidth={false} disableEscapeKeyDown={true} disableBackdropClick={true} open={gameRuning} onClose={closeGameDialog} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">게임 화면</DialogTitle>
         <DialogContent>
-        <GameScreen width={800} height={500} gameJson={gameFile} />
+          <GameScreen width={800} height={500} gameJson={gameFile} />
         </DialogContent>
         <DialogActions>
           <Button onClick={closeGameDialog} color="primary">
@@ -434,7 +521,7 @@ const renderBreadcrumbs = ()=>{
 
 
 
-      <Dialog disableEscapeKeyDown={true} open={openProjectNameDialog} onClose={()=>{projectNameCloseDialog(false)}} aria-labelledby="form-dialog-title">
+      <Dialog disableEscapeKeyDown={true} open={openProjectNameDialog} onClose={() => { projectNameCloseDialog(false) }} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">프로젝트 이름</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -447,21 +534,21 @@ const renderBreadcrumbs = ()=>{
             label="프로젝트 이름"
             defaultValue={projectName}
             fullWidth
-            onChange={(e)=>{setNewPName(e.target.value)}}
+            onChange={(e) => { setNewPName(e.target.value) }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={()=>{projectNameCloseDialog(false)}} color="secondary">
+          <Button onClick={() => { projectNameCloseDialog(false) }} color="secondary">
             취소
           </Button>
-          <Button onClick={()=>{projectNameCloseDialog(true)}} color="primary">
+          <Button onClick={() => { projectNameCloseDialog(true) }} color="primary">
             설정
           </Button>
         </DialogActions>
       </Dialog>
 
 
-      <Dialog open={openMcNameDialog} onClose={()=>{mcNameCloseDialog(false)}} aria-labelledby="form-dialog-title">
+      <Dialog open={openMcNameDialog} onClose={() => { mcNameCloseDialog(false) }} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">무비클립 이름</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -474,21 +561,21 @@ const renderBreadcrumbs = ()=>{
             label="무비클립 이름"
             defaultValue={"new_movieclip"}
             fullWidth
-            onChange={(e)=>{setNewPName(e.target.value)}}
+            onChange={(e) => { setNewPName(e.target.value) }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={()=>{mcNameCloseDialog(false)}} color="secondary">
+          <Button onClick={() => { mcNameCloseDialog(false) }} color="secondary">
             취소
           </Button>
-          <Button onClick={()=>{mcNameCloseDialog(true)}} color="primary">
+          <Button onClick={() => { mcNameCloseDialog(true) }} color="primary">
             설정
           </Button>
         </DialogActions>
       </Dialog>
 
 
-      <Dialog disableEscapeKeyDown={true} open={openMcNameDialog} onClose={()=>{mcNameCloseDialog(false)}} aria-labelledby="form-dialog-title">
+      <Dialog disableEscapeKeyDown={true} open={openMcNameDialog} onClose={() => { mcNameCloseDialog(false) }} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">무비클립 이름</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -501,14 +588,14 @@ const renderBreadcrumbs = ()=>{
             label="무비클립 이름"
             defaultValue={"new_movieclip"}
             fullWidth
-            onChange={(e)=>{setNewPName(e.target.value)}}
+            onChange={(e) => { setNewPName(e.target.value) }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={()=>{mcNameCloseDialog(false)}} color="secondary">
+          <Button onClick={() => { mcNameCloseDialog(false) }} color="secondary">
             취소
           </Button>
-          <Button onClick={()=>{mcNameCloseDialog(true)}} color="primary">
+          <Button onClick={() => { mcNameCloseDialog(true) }} color="primary">
             설정
           </Button>
         </DialogActions>
@@ -518,9 +605,9 @@ const renderBreadcrumbs = ()=>{
 
 
       <div className={styles.screenContainer}>
-        <Screen className = {styles.Screen} selectedTargetMoving={setXYPos} resetFunc={getResetFunc} width={800} height={500} movieClip={currentClip} frame={1} selectedTargetChanged={selectedTargetChanged} />
+        <Screen className={styles.Screen} selectedTargetMoving={setXYPos} resetFunc={getResetFunc} width={800} height={500} movieClip={currentClip} frame={1} selectedTargetChanged={selectedTargetChanged} />
         <div className={styles.Properties}>
-          <div className = {styles.tfContainer}>
+          <div className={styles.tfContainer}>
             <TextField
               label="오브젝트 이름"
               id="outlined-margin-dense"
@@ -528,23 +615,23 @@ const renderBreadcrumbs = ()=>{
               className={styles.test1}
               margin="dense"
               variant="outlined"
-              value={objectName} 
+              value={objectName}
               onChange={onNameInputChanged}
             />
           </div>
           <div className={styles.test2}>
-            <Breadcrumbs className = {classes.link} aria-label="breadcrumb">
-              {breadObjects.indexOf(mainClip)==-1&&(<div></div>)} 
-              {breadObjects.map((el) => 
-                (<Link title = {el.name} onClick={()=>{changeCurrentClip(el)}} className = {classes.link}>{(el.name.slice(0,6)+"…").slice(0,el.name.length)}</Link>)
+            <Breadcrumbs className={classes.link} aria-label="breadcrumb">
+              {breadObjects.indexOf(mainClip) == -1 && (<div></div>)}
+              {breadObjects.map((el) =>
+                (<Link title={el.name} onClick={() => { changeCurrentClip(el) }} className={classes.link}>{(el.name.slice(0, 6) + "…").slice(0, el.name.length)}</Link>)
               )}
             </Breadcrumbs>
           </div>
           <div className={styles.test3}>
-            <div ref = {ref => { xel.current = ref }}>X: - </div>
+            <div ref={ref => { xel.current = ref }}>X: - </div>
           </div>
           <div className={styles.test4}>
-            <div ref = {ref => { yel.current = ref }}>Y: -</div>
+            <div ref={ref => { yel.current = ref }}>Y: -</div>
           </div>
           <input onChange={graphicOpen} accept="image/*" className={classes.input} id="contained-button-file" type="file" />
           <div className={styles.test5}>
@@ -574,14 +661,14 @@ const renderBreadcrumbs = ()=>{
         isOpen={true}
         resizing={resizeBlocky}>
         <ReactBlocklyComponent.BlocklyEditor
-        initialXml={INITIAL_XML}
-        toolboxCategories={parseWorkspaceXml(INITIAL_TOOLBOX_XML)}
-        wrapperDivClassName={styles.Blockly}
-        workspaceDidChange={workspaceChange} />
+          initialXml={INITIAL_XML}
+          toolboxCategories={parseWorkspaceXml(INITIAL_TOOLBOX_XML)}
+          wrapperDivClassName={styles.Blockly}
+          workspaceDidChange={workspaceChange} />
       </ReactModal>
 
 
-      <div id="copy" style={{display: "none"}}>{"http://mandunda.com/#/player/"+projectName.replace(" ","_")}</div>
+      <div id="copy" style={{ display: "none" }}>{"http://mandunda.com/#/player/" + projectName.replace(" ", "_")}</div>
     </div>
   );
 }
@@ -592,16 +679,16 @@ export default App;
 
 /*
 
- 
+
       <TextField id="standard-basic" label="오브젝트 이름" value={objectName} onChange={onNameInputChanged} />
       <input onChange={graphicOpen} accept="image/*" className={classes.input} id="contained-button-file" type="file" />
       <label htmlFor="contained-button-file">
         <Button variant="contained" color="primary" disableElevation component="span">그래픽 추가</Button>
       </label>
 
-      
+
       <Button onClick={goInside} variant="outlined" disableElevation disabled={!isMovieclip}>안으로 들어가기</Button>
-      
+
       <Button onClick={removeSelectedObject} variant="contained" color="secondary" disableElevation>삭제</Button>
       <br />
       <Button onClick={gameStart} variant="contained" color="secondary" disableElevation>게임 실행</Button>

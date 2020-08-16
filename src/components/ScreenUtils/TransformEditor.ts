@@ -26,7 +26,11 @@ export default class TransformEditor {
     private tick() {
         this.frontUI.update();
         if (this.targetIndex == undefined)
+        {
+            this.setVisiblePoints(false);
             return;
+        }
+            
         const target = this.objects[this.targetIndex];
         const bound = target.getBounds();
         this.frontUI.drawRect(5, 0x66CC00, 1, bound.x - 2.5, bound.y - 2.5, bound.width + 5, bound.height + 5, 0);
@@ -47,7 +51,7 @@ export default class TransformEditor {
             point.zIndex = 1000;
             this.app.stage.sortChildren();
         }
-
+        document.addEventListener("keydown",(e)=>{if(e.keyCode == 27){this.removeTarget()}});
         this.app.stage.addListener("mouseup", () => { this.mouseUp() });
         this.app.stage.addListener("mousemove", (e) => { this.mouseMove(e.data.global.x, e.data.global.y) });
     }
@@ -140,6 +144,11 @@ export default class TransformEditor {
         if (this.state == State.moving)
             return;
         target.alpha = 1;
+    }
+
+    public mouseDown() {
+        console.log('asdasd')
+        this.removeTarget();
     }
 
     //events
