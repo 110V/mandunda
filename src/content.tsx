@@ -18,7 +18,12 @@ import "./customBlocks/generators/setPos"
 import "./customBlocks/generators/setVelocity"
 import "./customBlocks/generators/setRotation"
 import "./customBlocks/generators/currentObject"
-
+import "./customBlocks/generators/getCurrentFrame"
+import "./customBlocks/generators/play"
+import "./customBlocks/generators/stop"
+import "./customBlocks/generators/checkDrawing"
+import "./customBlocks/generators/gotoAndPlay"
+import "./customBlocks/generators/gotoAndStop"
 export const INITIAL_XML = '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>';
 
 export const INITIAL_TOOLBOX_XML = 
@@ -564,6 +569,82 @@ export const INITIAL_TOOLBOX_XML =
       </value>
     </block>
     <block type="currentobject"/>
+    <block type="checkdrawing">
+    <value name="isDrawing">
+      <block type="getobject">
+        <value name="objectName">
+          <block type="text">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+      </block>
+    </value>
+  </block>
+  <block type="getcurrentframe">
+    <value name="currentframe">
+      <block type="getobject">
+        <value name="objectName">
+          <block type="text">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+      </block>
+    </value>
+  </block>
+  <block type="stop">
+    <value name="obj">
+      <block type="getobject">
+        <value name="objectName">
+          <block type="text">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+      </block>
+    </value>
+  </block>
+  <block type="play">
+    <value name="obj">
+      <block type="getobject">
+        <value name="objectName">
+          <block type="text">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+      </block>
+    </value>
+  </block>
+  <block type="gotoandplay">
+    <value name="obj">
+      <block type="getobject">
+        <value name="objectName">
+          <block type="text">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+      </block>
+    </value>
+    <value name="frame">
+      <block type="math_number">
+        <field name="NUM">1</field>
+      </block>
+    </value>
+  </block>
+  <block type="gotoandstop">
+    <value name="obj">
+      <block type="getobject">
+        <value name="objectName">
+          <block type="text">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+      </block>
+    </value>
+    <value name="frame">
+      <block type="math_number">
+        <field name="NUM">1</field>
+      </block>
+    </value>
+  </block>
 </category>
 </xml>`;
 

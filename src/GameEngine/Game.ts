@@ -33,6 +33,7 @@ export default class Game {
             height: height,
             backgroundColor: backgroundColor
         });
+        this.objects["root"] = this.mainClip;
         this.target = target;
         this.setFps(fps);
         target.appendChild(this.app.view);
@@ -105,7 +106,7 @@ export default class Game {
 
     public addObject(name: string, object: MovieClip|Graphic) {
         this.objects[name] = object;
-        object.name = "e";
+        object.name = name;
     }
 
     public getObject(name: string) {

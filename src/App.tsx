@@ -96,7 +96,7 @@ let currentClip: MovieClip = mainClip;
 let workspace: any;
 let codes: { name: string, xml: any }[] = [{ name: "", xml: "<xml xmlns=\"https://developers.google.com/blockly/xml\"></xml>" }];
 let workspaceInit = false;
-
+let selectedObject2: MovieClip | Graphic | undefined = undefined;
 
 const App = () => {
   const workspaceChange = (w: any) => {
@@ -110,7 +110,7 @@ const App = () => {
   const [objectName, setObjectName] = useState("");
   const [isMovieclip, setIsMovieclip] = useState(false);
   const [selectedObject, setSelectedObject] = useState<MovieClip | Graphic | undefined>();
-  let selectedObject2: MovieClip | Graphic | undefined = undefined;
+  
 
   //xy view
   const xel = useRef<HTMLDivElement | null>();
@@ -137,14 +137,16 @@ const App = () => {
 
   const addGraphic = (name: string, texId: string) => {
     const graphic = new Graphic(name, new Transform(0, 0), resourceManager, texId);
-    currentClip.addObject(graphic, [1], [new Transform(0, 0)]);
-    updateScreen(currentClip);
+    currentClip.addObject(graphic, [currentFrame2.current], [new Transform(0, 0)]);
+    updateScreen(currentClip,currentFrame2.current);
     codes.push({ name: name, xml: "<xml xmlns=\"https://developers.google.com/blockly/xml\"></xml>" });
   }
 
   const changeCurrentClip = (clip: MovieClip) => {
+    currentFrame2.current = 1;
+    setCurrentFrame({frame:1,max:clip.getFrameCount()});
     currentClip = clip;
-    updateScreen(currentClip);
+    updateScreen(currentClip,1);
     renderBreadcrumbs();
   }
 
@@ -184,12 +186,11 @@ const App = () => {
       Blockly.Xml.domToWorkspace(dom, workspace);
     }
     catch{
-      console.log("오류남" + xml);
+      console.log("오류남\n" + xml);
     }
   }
 
   const selectedTargetChanged = (index: number | undefined) => {
-    console.log(selectedObject2?.name + "Asd");
     if (selectedObject2 == undefined) {
       saveCodeXmlByObjectName("");
     }
@@ -208,7 +209,7 @@ const App = () => {
       setWorkspaceCode(getCodeXmlByObjectName(""));
       return;
     }
-    const nselectedObject = currentClip.getFrame(1).getObjects()[index];
+    const nselectedObject = currentClip.getFrame(currentFrame2.current).getObjects()[index];
     if (!nselectedObject) {
       return;
     }
@@ -218,7 +219,6 @@ const App = () => {
     const pos = nselectedObject.getTransform();
     setSelectedObject(nselectedObject);
     selectedObject2 = nselectedObject;
-    console.log(selectedObject2 + "Asd2");
     setXYPos(pos.x, pos.y);
 
 
@@ -246,9 +246,10 @@ const App = () => {
   }
 
   const removeSelectedObject = () => {
-    if (selectedObject != undefined) {
-      currentClip.getFrame(1).removeObject(selectedObject);
-      updateScreen(currentClip);
+    if (selectedObject2 != undefined) {
+      console.log(currentClip.getFrame(currentFrame2.current));
+      currentClip.getFrame(currentFrame2.current).removeObject(selectedObject2);
+      updateScreen(currentClip,currentFrame2.current);
     }
   }
 
@@ -353,14 +354,14 @@ const App = () => {
     if (selectedObject == undefined)
       return;
     if (set && newMcName != "") {
-      currentClip.getFrame(1).removeObject(selectedObject);
+      currentClip.getFrame(currentFrame2.current).removeObject(selectedObject);
       let newPos = selectedObject.getTransform();
       const movieClip = new MovieClip(newMcName, new Transform(newPos.x, newPos.y));
       newPos.x = 0;
       newPos.y = 0;
       movieClip.addObject(selectedObject, [1], [newPos]);
       currentClip.addObject(movieClip, [1], [movieClip.getTransform()]);
-      updateScreen(currentClip);
+      updateScreen(currentClip,currentFrame2.current);
     }
     setOpenMcNameDialog(false);
   }
@@ -422,7 +423,7 @@ const App = () => {
       setWorkspaceCode(getCodeXmlByObjectName(selectedObject.name));
     }
     const objectJson = mainClip.exportJson();
-
+    console.log(objectJson);
     return JSON.stringify({ resource: resource, code: wholeCode, objects: objectJson });
   }
 
@@ -439,14 +440,27 @@ const App = () => {
       xel.current.textContent = "X: -";
       yel.current.textContent = "Y: -";
     }
-    xel.current.textContent = "X: " + x;
-    yel.current.textContent = "Y: " + y;
+    xel.current.textContent = "X: " + x.toFixed(3);
+    yel.current.textContent = "Y: " + y.toFixed(3);
   }
 
-
-  const [currentFrame, setCurrentFrame] = useState<{ frame: number, max: number }>({ frame: 1, max: 1 });
+  const currentFrame2 = useRef<number>(1);
+  const setCurrentFrame = (a:any)=>{
+    setCurrentFrameHook(a);
+    currentFrame2.current = a.frame;
+  };
+  const [currentFrame, setCurrentFrameHook] = useState<{ frame: number, max: number }>({ frame: 1, max: 1 });
   const frameChanged = (i: number) => {
-    setCurrentFrame({ frame: i, max: currentClip.getFrameCount() });
+    setCurrentFrame({frame:i,max:currentClip.getFrameCount()});
+    updateScreen(currentClip,i);
+    if(currentClip.getFrame(i).getObjects().length>0){
+      selectedTargetChanged(1);
+    }
+    else{
+      selectedTargetChanged(undefined);
+    }
+
+    console.log(currentClip.getFrame(i));
   }
   const frameAdd = (i: number) => {
     frameChanged(currentClip.addFrame());

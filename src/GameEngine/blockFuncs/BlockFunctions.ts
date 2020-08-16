@@ -139,4 +139,47 @@ BlockFunctions["setRotation"] = (game: Game, object: (MovieClip | Graphic), angl
     object.setTransform(transform);
 }
 
+
+BlockFunctions["play"] = (game: Game, object: (MovieClip | Graphic)) => {
+    if(object instanceof MovieClip)
+    {
+        object.play();
+    }
+}
+
+BlockFunctions["stop"] = (game: Game, object: (MovieClip | Graphic)) => {
+    if(object instanceof MovieClip)
+    {
+        object.stop();
+    }
+}
+
+BlockFunctions["gotoAndPlay"] = (game: Game, object: (MovieClip | Graphic),frame:number) => {
+    if(object instanceof MovieClip)
+    {
+        object.gotoAndPlay(frame);
+    }
+}
+
+BlockFunctions["gotoAndStop"] = (game: Game, object: (MovieClip | Graphic),frame:number) => {
+    if(object instanceof MovieClip)
+    {
+        object.gotoAndStop(frame);
+    }
+}
+
+BlockFunctions["checkDrawing"] = (game: Game, object: (MovieClip | Graphic)) => {
+    return game.mainClip.getCurrentFrame().getObjects().indexOf(object)!=-1;
+}
+
+BlockFunctions["getCurrentFrame"] = (game: Game, object: (MovieClip | Graphic)) => {
+    if(object instanceof MovieClip)
+    {
+        return object.currentFrame;
+    }
+    else{
+        return 1;
+    }
+}
+
 export default BlockFunctions;

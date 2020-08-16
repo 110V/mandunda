@@ -40,7 +40,6 @@ let pixiObjects:PIXI.DisplayObject[];
 
 
 const Screen: React.FC<Props> = (props) => {
-    
     const stageDiv = useRef<HTMLElement | null>(null);
     const init = ()=>{
         app  = new PIXI.Application({ width: props.width, height: props.height,backgroundColor:0xFFFFFF });
@@ -69,7 +68,7 @@ const Screen: React.FC<Props> = (props) => {
         props.resetFunc(reset);
     }
 
-    const reset = (movieClip:MovieClip)=>{
+    const reset = (movieClip:MovieClip,frameNum:number)=>{
         if(container)
             app.stage.removeChild(container);
         
@@ -77,7 +76,7 @@ const Screen: React.FC<Props> = (props) => {
         container.interactiveChildren = true;
         container.interactive = true;
         app.stage.addChild(container);
-        frame = movieClip.getFrame(props.frame);
+        frame = movieClip.getFrame(frameNum);
         frame.rebatchAll();
         gameObjects = frame.getObjects();
         
@@ -88,7 +87,7 @@ const Screen: React.FC<Props> = (props) => {
             let pixiObject:PIXI.DisplayObject;
     
             if(gameObject instanceof MovieClip){
-                pixiObject=gameObject.makeContainer(1)
+                pixiObject=gameObject.makeContainer(1);
             }
             else{
                 pixiObject=gameObject.sprite;

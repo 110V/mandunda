@@ -268,3 +268,91 @@ Blockly.Blocks['currentobject'] = {
  this.setHelpUrl("");
   }
 };
+Blockly.Blocks['checkdrawing'] = {
+  init: function() {
+    this.appendValueInput("isDrawing")
+        .setCheck("object")
+        .appendField("다음 오브젝트가 그려지는 중인가?");
+    this.setOutput(true, "Boolean");
+    this.setColour(230);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+Blockly.Blocks['getcurrentframe'] = {
+  init: function() {
+    this.appendValueInput("currentframe")
+        .setCheck("object")
+        .appendField("다음 오브젝트의 현재 프레임");
+    this.setOutput(true, "Number");
+    this.setColour(230);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+Blockly.Blocks['gotoandplay'] = {
+  init: function() {
+    this.appendValueInput("obj")
+        .setCheck("object")
+        .appendField("오브젝트");
+    this.appendValueInput("frame")
+        .setCheck("Number")
+        .appendField("프레임");
+    this.appendDummyInput()
+        .appendField("으로 이동한뒤 재생");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+Blockly.Blocks['gotoandstop'] = {
+  init: function() {
+    this.appendValueInput("obj")
+        .setCheck("object")
+        .appendField("오브젝트");
+    this.appendValueInput("frame")
+        .setCheck("Number")
+        .appendField("프레임");
+    this.appendDummyInput()
+        .appendField("으로 이동한뒤 멈춤");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+Blockly.Blocks['stop'] = {
+  init: function() {
+    this.appendValueInput("obj")
+        .setCheck("object")
+        .appendField("오브젝트");
+    this.appendDummyInput()
+        .appendField("프레임 멈춤");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+Blockly.Blocks['play'] = {
+  init: function() {
+    this.appendValueInput("obj")
+        .setCheck("object")
+        .appendField("오브젝트");
+    this.appendDummyInput()
+        .appendField("프레임 재생");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
